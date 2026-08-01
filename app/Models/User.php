@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -29,12 +30,12 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'id', 'name', 'email', 'email_verified_at', 'locale', 'timezone', 'avatar_path', 'last_seen_at', 'created_at', 'updated_at', 'two_factor_confirmed_at'])]
+#[Fillable(['name', 'email', 'password', 'email_verified_at', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'remember_token', 'locale', 'timezone', 'avatar_path', 'last_seen_at', 'current_organization_id'])]
+#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'two_factor_confirmed_at'])]
 class User extends Authenticatable implements PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable, HasUuids;
+    use HasFactory, HasUuids, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
      * Get the attributes that should be cast.
@@ -52,6 +53,11 @@ class User extends Authenticatable implements PasskeyUser
 
     public function organizations(): HasMany
     {
-        return $this->hasMany(Organization::class);
+        return $this->hasMany(Organization::class, 'owner_user_id');
+    }
+
+    public function currentOrganization(): HasOne
+    {
+        return $this->hasOne(Organization::class, 'id', 'current_organization_id');
     }
 }

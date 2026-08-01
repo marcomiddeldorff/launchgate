@@ -2,6 +2,9 @@
 
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\SetCurrentOrganizationMiddleware;
+use App\Jobs\DeleteExpiredInvitationsJob;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,9 +25,19 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        $middleware->alias([
+            'current_organization' => SetCurrentOrganizationMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
-    })->create();
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->job(DeleteExpiredInvitationsJob::class)
+            ->everyFifteenMinutes()
+            ->withoutOverlapping();
+    })
+    ->create();

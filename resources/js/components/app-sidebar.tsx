@@ -1,63 +1,76 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
-import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
+
+import { OrganizationSwitcher } from '@/components/layout/organization-switcher';
 import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
+    SidebarGroup,
+    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
-import type { NavItem } from '@/types';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
+import { useAppContext } from '@/hooks/use-app-context';
+import { useCurrentUrl } from '@/hooks/use-current-url';
+import { navGroups } from '@/lib/navigation';
 
 export function AppSidebar() {
+    const { organization, organizations, abilities } = useAppContext();
+    const { currentUrl } = useCurrentUrl();
+
+    const isActive = (href: string, matchPrefix?: string) =>
+        matchPrefix ? currentUrl.startsWith(matchPrefix) : currentUrl === href;
+
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon" variant="sidebar">
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
-                                <AppLogo />
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <OrganizationSwitcher
+                    organization={organization}
+                    organizations={organizations}
+                />
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                {navGroups.map((group) => {
+                    const items = group.items.filter(
+                        (item) => !item.can || item.can(abilities),
+                    );
+
+                    if (items.length === 0) {
+                        return null;
+                    }
+
+                    return (
+                        <SidebarGroup key={group.label} className="px-2 py-0">
+                            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+                            <SidebarMenu>
+                                {items.map((item) => (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={isActive(
+                                                item.href,
+                                                item.matchPrefix,
+                                            )}
+                                            tooltip={{ children: item.title }}
+                                        >
+                                            <Link href={item.href} prefetch>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroup>
+                    );
+                })}
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

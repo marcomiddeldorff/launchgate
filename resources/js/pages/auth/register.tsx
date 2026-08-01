@@ -11,14 +11,16 @@ import { store } from '@/routes/register';
 
 type Props = {
     passwordRules: string;
+    invitationId: string | null;
+    email: string | null;
 };
 
-export default function Register({ passwordRules }: Props) {
+export default function Register({ passwordRules, invitationId, email }: Props) {
     return (
         <>
             <Head title="Register" />
             <Form
-                {...store.form()}
+                {...store.post()}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
@@ -47,14 +49,19 @@ export default function Register({ passwordRules }: Props) {
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
+                                    disabled={invitationId !== ''}
                                     id="email"
                                     type="email"
                                     required
                                     tabIndex={2}
                                     autoComplete="email"
                                     name="email"
+                                    defaultValue={email ?? ''}
                                     placeholder="email@example.com"
                                 />
+
+                                <input type="hidden" value={email ?? undefined} name="email" />
+
                                 <InputError message={errors.email} />
                             </div>
 
@@ -89,6 +96,8 @@ export default function Register({ passwordRules }: Props) {
                                     message={errors.password_confirmation}
                                 />
                             </div>
+
+                            <input type={'hidden'} value={invitationId ?? ''} name="invitationId" />
 
                             <Button
                                 type="submit"

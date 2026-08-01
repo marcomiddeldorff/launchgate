@@ -6,14 +6,51 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable('name', 'slug', 'logo_path', 'default_locale', 'timezone', 'owner_user_id', 'deleted_at')]
 class Organization extends Model
 {
     use HasUuids;
 
+    protected $appends = [
+        'logo_url',
+    ];
+
     public function ownerUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_user_id');
+    }
+
+    public function memberships(): HasMany
+    {
+        return $this->hasMany(OrganizationMembership::class);
+    }
+
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(Invitation::class);
+    }
+
+    public function isOwner(?string $userId = null): bool
+    {
+        return $this->owner_user_id === ($userId ?: auth()->id());
+    }
+
+    public function isMember(?string $userId = null): bool
+    {
+        $members = $this->memberships()->pluck('id')->toArray();
+
+        return in_array($userId ?: auth()->id(), $members);
+    }
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if ($this->logo_path && Storage::disk('public')->exists($this->logo_path)) {
+            return asset('storage/'.$this->logo_path);
+        }
+
+        return null;
     }
 }

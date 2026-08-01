@@ -30,7 +30,11 @@ export default function EditUser({ membership, onClose, organization }: EditUser
     const submit: SubmitEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
-        put(organizationMembershipController.update({ organization: organization.id, membership: membership?.id }).url, {
+        if (!membership) {
+            return;
+        }
+
+        put(organizationMembershipController.update({ organization: organization.id, membership: membership.id }).url, {
             onSuccess: () => {
                 onClose();
             }

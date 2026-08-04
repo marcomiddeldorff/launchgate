@@ -11,7 +11,6 @@ import {
 import { ReviewProgress } from '@/components/status/progress-visuals';
 import { Button } from '@/components/ui/button';
 import { formatDate, formatDateTime } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import {
     approvalsForRelease,
     getRelease,
@@ -19,6 +18,7 @@ import {
     snapshotForRelease,
     suitesForRelease,
 } from '@/mocks';
+import releaseRoutes from '@/routes/releases';
 
 function Section({
     title,
@@ -60,7 +60,7 @@ export default function ReleaseReport({ id }: { id: string }) {
             <div className="no-print border-b bg-muted/40">
                 <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-3">
                     <Button variant="ghost" size="sm" asChild>
-                        <Link href={paths.releases.show(release.id)}>
+                        <Link href={releaseRoutes.show.url(release.id)}>
                             <ArrowLeft /> Zurück zum Release
                         </Link>
                     </Button>

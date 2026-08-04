@@ -71,7 +71,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::registerView(function (Request $request) {
             $invitationId = $request->query('invitation');
 
-            $invitation = Invitation::find($invitationId);
+            $invitation = Invitation::findOrFail($invitationId);
 
             if ($invitation->isExpired()) {
                 abort(404, 'Die Einladung ist abgelaufen.');

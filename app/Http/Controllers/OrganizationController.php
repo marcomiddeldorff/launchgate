@@ -7,7 +7,6 @@ use App\Actions\Organizations\UpdateOrganization;
 use App\Actions\Organizations\UploadLogoForOrganization;
 use App\Http\Requests\Organization\UpdateOrganizationRequest;
 use App\Http\Requests\Organizations\StoreOrganizationRequest;
-use App\Http\Resources\OrganizationResource;
 use App\Models\Organization;
 use App\Support\Toast;
 use DateTimeZone;
@@ -31,7 +30,7 @@ class OrganizationController extends Controller
             ->get();
 
         return Inertia::render('organizations/index', [
-            'organizations' => OrganizationResource::collection($organizations)->resolve(),
+            'organizations' => $organizations,
         ]);
     }
 
@@ -79,7 +78,7 @@ class OrganizationController extends Controller
         $organization->loadCount(['invitations'])->loadMissing(['memberships.user', 'invitations']);
 
         return Inertia::render('organizations/show', [
-            'organization' => new OrganizationResource($organization),
+            'organization' => $organization,
         ]);
     }
 
@@ -89,7 +88,7 @@ class OrganizationController extends Controller
     public function edit(Organization $organization): Response
     {
         return Inertia::render('organizations/edit', [
-            'organization' => new OrganizationResource($organization),
+            'organization' => $organization,
             'timezones' => DateTimeZone::listIdentifiers(),
         ]);
     }

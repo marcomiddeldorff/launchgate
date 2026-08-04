@@ -12,7 +12,17 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { UserAbilities } from '@/lib/roles';
-import { paths } from '@/lib/routes';
+import { dashboard } from '@/routes';
+import approvalRoutes from '@/routes/approvals';
+import clientRoutes from '@/routes/clients';
+import issueRoutes from '@/routes/issues';
+import memberRoutes from '@/routes/members';
+import orgSettingsRoutes from '@/routes/org-settings';
+import organizationRoutes from '@/routes/organizations';
+import projectRoutes from '@/routes/projects';
+import releaseRoutes from '@/routes/releases';
+import reviewRoutes from '@/routes/reviews';
+import templateRoutes from '@/routes/templates';
 
 export type AppNavItem = {
     title: string;
@@ -34,43 +44,43 @@ export const primaryNav: AppNavGroup = {
     items: [
         {
             title: 'Übersicht',
-            href: paths.dashboard,
+            href: dashboard.url(),
             icon: LayoutDashboard,
         },
         {
             title: 'Kunden',
-            href: paths.clients.index,
+            href: clientRoutes.index.url(),
             icon: Building2,
             matchPrefix: '/clients',
             can: (a) => a.manageProjects,
         },
         {
             title: 'Projekte',
-            href: paths.projects.index,
+            href: projectRoutes.index.url(),
             icon: FolderKanban,
             matchPrefix: '/projects',
         },
         {
             title: 'Releases',
-            href: paths.releases.index,
+            href: releaseRoutes.index.url(),
             icon: Rocket,
             matchPrefix: '/releases',
         },
         {
             title: 'Meine Prüfungen',
-            href: paths.reviews.mine,
+            href: reviewRoutes.mine.url(),
             icon: ClipboardCheck,
             can: (a) => a.runReviews,
         },
         {
             title: 'Issues',
-            href: paths.issues.index,
+            href: issueRoutes.index.url(),
             icon: Bug,
             matchPrefix: '/issues',
         },
         {
             title: 'Freigaben',
-            href: paths.approvals.index,
+            href: approvalRoutes.index.url(),
             icon: UserCheck,
             matchPrefix: '/approvals',
         },
@@ -82,25 +92,25 @@ export const manageNav: AppNavGroup = {
     items: [
         {
             title: 'Organisationen',
-            href: paths.organizations.index,
+            href: organizationRoutes.index.url(),
             icon: Building2,
             can: (a) => a.manageOrganization,
         },
         {
             title: 'Vorlagen',
-            href: paths.templates,
+            href: templateRoutes.index.url(),
             icon: ListChecks,
             can: (a) => a.manageReviewItems,
         },
         {
             title: 'Mitglieder',
-            href: paths.members,
+            href: memberRoutes.index.url(),
             icon: Users,
             can: (a) => a.manageMembers,
         },
         {
             title: 'Einstellungen',
-            href: paths.settings.organization,
+            href: orgSettingsRoutes.general.url(),
             icon: Settings,
             matchPrefix: '/settings',
         },

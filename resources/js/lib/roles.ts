@@ -1,5 +1,5 @@
 import type { StatusTone } from '@/lib/status';
-import type { OrganizationRole } from '@/types';
+import { OrganizationRole, ProjectRole } from '@/types';
 
 export type RoleMeta = {
     label: string;
@@ -8,32 +8,53 @@ export type RoleMeta = {
 };
 
 export const organizationRoleMeta: Record<OrganizationRole, RoleMeta> = {
-    owner: {
-        label: 'Owner',
+    [OrganizationRole.Admin]: {
+        label: 'Administrator',
         description:
-            'Verwaltet die Organisation, Mitglieder und Abrechnung und sieht alle Projekte.',
+            'Voller Zugriff: verwaltet Mitglieder, Projekte und Releases der Organisation.',
         tone: 'primary',
     },
-    project_manager: {
-        label: 'Project Manager',
+    [OrganizationRole.ProjectManager]: {
+        label: 'Projektmanager',
         description:
             'Verwaltet Projekte und Releases, erstellt Prüfgegenstände und fordert Freigaben an.',
         tone: 'info',
     },
-    developer: {
-        label: 'Developer',
+    [OrganizationRole.Developer]: {
+        label: 'Entwickler',
         description:
             'Bearbeitet Issues, schreibt interne Kommentare und trägt neue Builds ein.',
         tone: 'retest',
     },
-    client_tester: {
-        label: 'Client Tester',
+    [OrganizationRole.Viewer]: {
+        label: 'Betrachter',
+        description:
+            'Nur-Lese-Zugriff auf zugewiesene Projekte, Releases und deren Fortschritt.',
+        tone: 'neutral',
+    },
+};
+
+export const projectRoleMeta: Record<ProjectRole, RoleMeta> = {
+    [ProjectRole.ProjectManager]: {
+        label: 'Projektmanager',
+        description:
+            'Verwaltet Projekte und Releases, erstellt Prüfgegenstände und fordert Freigaben an.',
+        tone: 'info',
+    },
+    [ProjectRole.Developer]: {
+        label: 'Entwickler',
+        description:
+            'Bearbeitet Issues, schreibt interne Kommentare und trägt neue Builds ein.',
+        tone: 'retest',
+    },
+    [ProjectRole.ClientTester]: {
+        label: 'Kunde / Tester',
         description:
             'Führt zugewiesene Prüfungen durch, meldet Probleme und gibt Releases frei.',
         tone: 'success',
     },
-    approver: {
-        label: 'Approver',
+    [ProjectRole.Approver]: {
+        label: 'Freigeber',
         description:
             'Prüft die Release-Zusammenfassung und erteilt oder verweigert die Freigabe.',
         tone: 'warning',
@@ -42,7 +63,7 @@ export const organizationRoleMeta: Record<OrganizationRole, RoleMeta> = {
 
 /**
  * Permissions expressed as capabilities rather than raw role checks, so that
- * the UI never hard-codes `role === 'owner'` in dozens of places.
+ * the UI never hard-codes `role === 'admin'` in dozens of places.
  */
 export type UserAbilities = {
     manageOrganization: boolean;
@@ -59,19 +80,20 @@ export type UserAbilities = {
 };
 
 export function abilitiesForRole(role: OrganizationRole): UserAbilities {
-    const staff = role === 'owner' || role === 'project_manager';
+    const admin = role === OrganizationRole.Admin;
+    const staff = admin || role === OrganizationRole.ProjectManager;
 
     return {
-        manageOrganization: role === 'owner',
-        manageMembers: role === 'owner',
+        manageOrganization: admin,
+        manageMembers: admin,
         manageProjects: staff,
         manageReleases: staff,
         manageReviewItems: staff,
-        runReviews: role === 'client_tester' || staff || role === 'developer',
-        editIssues: role === 'developer' || staff,
-        viewInternalComments: role !== 'client_tester' && role !== 'approver',
+        runReviews: staff || role === OrganizationRole.Developer,
+        editIssues: staff || role === OrganizationRole.Developer,
+        viewInternalComments: role !== OrganizationRole.Viewer,
         requestApprovals: staff,
-        decideApprovals: role === 'approver' || role === 'owner',
+        decideApprovals: admin,
         completeReleases: staff,
     };
 }

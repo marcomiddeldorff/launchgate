@@ -7,34 +7,39 @@ import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { paths } from '@/lib/routes';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import slugify from '@/lib/slugify';
 import { organization } from '@/mocks';
 import organizations from '@/routes/organizations';
-
 
 export default function OrganizationsCreate() {
     const { timezones } = usePage().props;
 
     const { data, setData, errors, processing, post } = useForm({
-        name: "",
-        slug: "",
+        name: '',
+        slug: '',
         logo: null as File | null,
-        default_locale: "",
-        timezone: "",
-    })
+        default_locale: '',
+        timezone: '',
+    });
 
     const submit = (e) => {
         e.preventDefault();
 
-        post(organizations.store.url())
-    }
+        post(organizations.store.url());
+    };
 
     const onChangeName = (name: string) => {
         setData('name', name);
         setData('slug', slugify(name));
-    }
+    };
 
     return (
         <>

@@ -1,10 +1,16 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\EnvironmentController;
 use App\Http\Controllers\Organization\SetCurrentOrganizationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\OrganizationMembershipController;
+use App\Http\Controllers\ProjectController;
+use \App\Http\Controllers\Projects;
+use App\Http\Middleware\RequireOrganizationMiddleware;
 use Illuminate\Support\Facades\Route;
+
+require __DIR__ . '/auth.php';
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -13,13 +19,14 @@ Route::get('/invitation', [OrganizationMembershipController::class, 'show'])
 Route::inertia('invitations/accept', 'auth/accept-invitation')
     ->name('invitations.accept');
 
+Route::get('project/{project}/invitation', Projects\ShowProjectInvitationController::class)
+    ->name('project.invitations.show');
+
 Route::middleware(['auth'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 
     Route::inertia('onboarding', 'onboarding/index')->name('onboarding');
 
-    // Clients
-    Route::resource('clients', ClientController::class);
     Route::resource('organizations', OrganizationController::class);
     Route::post('organizations/{organization}/set-current', SetCurrentOrganizationController::class)
         ->name('organizations.set-current');
@@ -27,19 +34,21 @@ Route::middleware(['auth'])->group(function () {
         ->name('organizations.memberships.store');
     Route::put('organizations/{organization}/memberships/{membership}', [OrganizationMembershipController::class, 'update'])
         ->name('organizations.memberships.update');
-    //Route::
+    // Route::
 
-    // Projects
-    Route::inertia('projects', 'projects/index')->name('projects.index');
-    Route::inertia('projects/create', 'projects/create')->name('projects.create');
-    Route::get('projects/{project}/members', fn (string $project) => inertia('projects/settings', ['id' => $project, 'tab' => 'members']))
-        ->name('projects.members');
-    Route::get('projects/{project}/environments', fn (string $project) => inertia('projects/settings', ['id' => $project, 'tab' => 'environments']))
-        ->name('projects.environments');
-    Route::get('projects/{project}/settings', fn (string $project) => inertia('projects/settings', ['id' => $project, 'tab' => 'general']))
-        ->name('projects.settings');
-    Route::get('projects/{project}', fn (string $project) => inertia('projects/show', ['id' => $project]))
-        ->name('projects.show');
+    Route::middleware(RequireOrganizationMiddleware::class)->group(function () {
+        Route::resource('clients', ClientController::class);
+
+
+        Route::resource('projects', ProjectController::class);
+        Route::get('projects/{project}/settings', Projects\SettingsProjectController::class);
+        Route::get('projects/{project}/members', Projects\MembersProjectController::class);
+        Route::post('projects/{project}/members/add', Projects\AddMemberToProjectController::class);
+        Route::put('projects/{project}/archive', Projects\ArchiveProjectController::class);
+
+        Route::resource('projects.environments', EnvironmentController::class)
+            ->except(['show']);
+    });
 
     // Releases
     Route::inertia('releases', 'releases/index')->name('releases.index');

@@ -1,4 +1,5 @@
 import { users } from '@/mocks/users';
+import { ProjectRole } from '@/types';
 import type { Client, Environment, Project, ProjectMember } from '@/types';
 
 export const clients: Client[] = [
@@ -135,21 +136,21 @@ const staffMembers: ProjectMember[] = [
     {
         id: 'pm_jonas',
         user: users.jonas,
-        role: 'project_manager',
+        role: ProjectRole.ProjectManager,
         canApprove: true,
         canViewInternalComments: true,
     },
     {
         id: 'pm_marie',
         user: users.marie,
-        role: 'developer',
+        role: ProjectRole.Developer,
         canApprove: false,
         canViewInternalComments: true,
     },
     {
         id: 'pm_timo',
         user: users.timo,
-        role: 'developer',
+        role: ProjectRole.Developer,
         canApprove: false,
         canViewInternalComments: true,
     },
@@ -197,14 +198,14 @@ export const projects: Project[] = [
             {
                 id: 'pm_petra',
                 user: users.petra,
-                role: 'client_tester',
+                role: ProjectRole.ClientTester,
                 canApprove: true,
                 canViewInternalComments: false,
             },
             {
                 id: 'pm_andreas',
                 user: users.andreas,
-                role: 'approver',
+                role: ProjectRole.Approver,
                 canApprove: true,
                 canViewInternalComments: false,
             },
@@ -235,7 +236,7 @@ export const projects: Project[] = [
             {
                 id: 'pm_sabine',
                 user: users.sabine,
-                role: 'client_tester',
+                role: ProjectRole.ClientTester,
                 canApprove: false,
                 canViewInternalComments: false,
             },
@@ -266,7 +267,7 @@ export const projects: Project[] = [
             {
                 id: 'pm_katrin',
                 user: users.katrin,
-                role: 'client_tester',
+                role: ProjectRole.ClientTester,
                 canApprove: true,
                 canViewInternalComments: false,
             },

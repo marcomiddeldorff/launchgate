@@ -6,7 +6,14 @@ import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import slugify from '@/lib/slugify';
 import organizations from '@/routes/organizations';
 import type { Organization } from '@/types';
@@ -15,15 +22,17 @@ import { SubmitEventHandler } from 'react';
 type OrganizationsEditProps = {
     organization: Organization;
     timezones: string[];
-}
+};
 
-export default function OrganizationsEdit({ organization, timezones }: OrganizationsEditProps) {
-
+export default function OrganizationsEdit({
+    organization,
+    timezones,
+}: OrganizationsEditProps) {
     const { data, setData, errors, processing, post } = useForm({
         name: organization.name,
         slug: organization.slug,
         logo: null as File | null,
-        default_locale: organization.defaultLocale,
+        default_locale: organization.default_locale,
         timezone: organization.timezone,
         _method: 'put',
     });
@@ -31,13 +40,13 @@ export default function OrganizationsEdit({ organization, timezones }: Organizat
     const submit: SubmitEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
-        post(organizations.update.url({ organization: organization.id }))
-    }
+        post(organizations.update.url({ organization: organization.id }));
+    };
 
     const onChangeName = (name: string) => {
         setData('name', name);
         setData('slug', slugify(name));
-    }
+    };
 
     return (
         <>
@@ -51,7 +60,9 @@ export default function OrganizationsEdit({ organization, timezones }: Organizat
                     },
                     {
                         title: 'Organisation bearbeiten',
-                        href: organizations.edit.url({ organization: organization.id }),
+                        href: organizations.edit.url({
+                            organization: organization.id,
+                        }),
                     },
                 ]}
                 title="Organisation bearbeiten"

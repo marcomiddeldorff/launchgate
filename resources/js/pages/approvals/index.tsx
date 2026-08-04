@@ -7,8 +7,8 @@ import { ApprovalStatusBadge } from '@/components/status/badges';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserInline } from '@/components/user-avatar';
 import { formatDate, formatRelative } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import { approvals } from '@/mocks';
+import approvalRoutes from '@/routes/approvals';
 
 export default function ApprovalsIndex() {
     const pending = approvals.filter((a) => a.status === 'pending');
@@ -20,7 +20,7 @@ export default function ApprovalsIndex() {
     ) => (
         <Link
             key={approval.id}
-            href={paths.approvals.show(approval.id)}
+            href={approvalRoutes.show.url(approval.id)}
             className="block rounded-lg border bg-card p-4 transition-colors hover:border-primary/40"
         >
             <div className="flex flex-wrap items-center justify-between gap-2">

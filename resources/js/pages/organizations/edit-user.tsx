@@ -1,31 +1,47 @@
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import type { SubmitEventHandler} from 'react';
+import type { SubmitEventHandler } from 'react';
 import { useEffect } from 'react';
 import organizationMembershipController from '@/actions/App/Http/Controllers/OrganizationMembershipController';
 import { FormField } from '@/components/forms/form-field';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { organizationRoleMeta } from '@/lib/roles';
-import type { Organization, OrganizationMembership, OrganizationRole } from '@/types';
-
+import { OrganizationRole } from '@/types';
+import type { Organization, OrganizationMembership } from '@/types';
 
 type EditUserProps = {
     membership: OrganizationMembership | null;
     organization: Organization;
     onClose: () => void;
-}
+};
 
-export default function EditUser({ membership, onClose, organization }: EditUserProps) {
-
+export default function EditUser({
+    membership,
+    onClose,
+    organization,
+}: EditUserProps) {
     const { data, setData, errors, processing, put } = useForm<{
-        role: OrganizationRole
+        role: OrganizationRole;
     }>({
-        role: membership?.role as OrganizationRole ?? 'client_tester'
-    })
+        role: (membership?.role as OrganizationRole) ?? OrganizationRole.Viewer,
+    });
 
     const submit: SubmitEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
@@ -34,12 +50,18 @@ export default function EditUser({ membership, onClose, organization }: EditUser
             return;
         }
 
-        put(organizationMembershipController.update({ organization: organization.id, membership: membership.id }).url, {
-            onSuccess: () => {
-                onClose();
-            }
-        })
-    }
+        put(
+            organizationMembershipController.update({
+                organization: organization.id,
+                membership: membership.id,
+            }).url,
+            {
+                onSuccess: () => {
+                    onClose();
+                },
+            },
+        );
+    };
 
     useEffect(() => {
         if (membership) {
@@ -80,7 +102,7 @@ export default function EditUser({ membership, onClose, organization }: EditUser
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        {Object.keys(organizationRoleMeta).map(
+                                        {Object.values(OrganizationRole).map(
                                             (role) => (
                                                 <SelectItem
                                                     value={role}
@@ -88,7 +110,7 @@ export default function EditUser({ membership, onClose, organization }: EditUser
                                                 >
                                                     {
                                                         organizationRoleMeta[
-                                                            role as OrganizationRole
+                                                            role
                                                         ].label
                                                     }
                                                 </SelectItem>

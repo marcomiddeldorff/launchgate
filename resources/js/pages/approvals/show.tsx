@@ -19,8 +19,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { UserInline } from '@/components/user-avatar';
 import { useAppContext } from '@/hooks/use-app-context';
 import { formatDate, formatDateTime } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import { getApproval, getRelease } from '@/mocks';
+import approvalRoutes from '@/routes/approvals';
+import releaseRoutes from '@/routes/releases';
 import type { ApprovalDecisionType } from '@/types';
 
 const decisionOptions: {
@@ -82,7 +83,10 @@ export default function ApprovalShow({ id }: { id: string }) {
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 md:p-6">
                 <PageHeader
                     breadcrumbs={[
-                        { title: 'Freigaben', href: paths.approvals.index },
+                        {
+                            title: 'Freigaben',
+                            href: approvalRoutes.index.url(),
+                        },
                         { title: approval.releaseName },
                     ]}
                     title="Freigabeentscheidung"
@@ -363,7 +367,7 @@ export default function ApprovalShow({ id }: { id: string }) {
                                 <div className="mt-3">
                                     <Button variant="outline" size="sm" asChild>
                                         <Link
-                                            href={paths.releases.show(
+                                            href={releaseRoutes.show.url(
                                                 release.id,
                                             )}
                                         >

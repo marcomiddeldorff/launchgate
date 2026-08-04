@@ -9,10 +9,12 @@ import { StatusBadge } from '@/components/status/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { formatDate } from '@/lib/format';
-import { paths } from '@/lib/routes';
+import { hasOrganizationRoles } from '@/lib/permissions';
 import type { StatusTone } from '@/lib/status';
-import { clients } from '@/mocks';
+import clientRoutes from '@/routes/clients';
 import type { Client, ClientStatus } from '@/types';
+import { OrganizationRole } from '@/types';
+import { Callout } from '@/components/callout';
 
 const clientStatusMeta: Record<
     ClientStatus,
@@ -35,7 +37,11 @@ function ClientStatusBadge({ status }: { status: ClientStatus }) {
     );
 }
 
-export default function ClientsIndex() {
+type ClientsIndexProps = {
+    clients: Client[];
+};
+
+export default function ClientsIndex({ clients }: ClientsIndexProps) {
     const columns: DataTableColumn<Client>[] = [
         {
             id: 'name',
@@ -47,9 +53,9 @@ export default function ClientsIndex() {
                     </span>
                     <div>
                         <p className="font-medium">{c.name}</p>
-                        {c.primaryDomain && (
+                        {c.primary_domain && (
                             <p className="text-sm text-muted-foreground">
-                                {c.primaryDomain}
+                                {c.primary_domain}
                             </p>
                         )}
                     </div>
@@ -73,33 +79,33 @@ export default function ClientsIndex() {
             cell: (c) => <ClientStatusBadge status={c.status} />,
             hideOnMobile: true,
         },
-        {
+        /*{
             id: 'projects',
             header: 'Projekte',
             cell: (c) => <span className="tabular-nums">{c.projectCount}</span>,
             sortValue: (c) => c.projectCount,
             align: 'center',
             hideOnMobile: true,
-        },
-        {
-            id: 'releases',
-            header: 'Aktive Releases',
-            cell: (c) => (
-                <span className="tabular-nums">{c.activeReleaseCount}</span>
-            ),
-            sortValue: (c) => c.activeReleaseCount,
-            align: 'center',
-            hideOnMobile: true,
-        },
+        },*/
+        // {
+        //     id: 'releases',
+        //     header: 'Aktive Releases',
+        //     cell: (c) => (
+        //         <span className="tabular-nums">{c.activeReleaseCount}</span>
+        //     ),
+        //     sortValue: (c) => c.activeReleaseCount,
+        //     align: 'center',
+        //     hideOnMobile: true,
+        // },
         {
             id: 'created',
             header: 'Kunde seit',
             cell: (c) => (
                 <span className="text-sm text-muted-foreground">
-                    {formatDate(c.createdAt)}
+                    {formatDate(c.created_at)}
                 </span>
             ),
-            sortValue: (c) => c.createdAt,
+            sortValue: (c) => c.created_at,
             hideOnMobile: true,
         },
     ];
@@ -113,21 +119,31 @@ export default function ClientsIndex() {
                     title="Kunden"
                     description="Die Auftraggeber, für die deine Organisation Releases prüft und freigibt."
                     actions={
-                        <Button asChild>
-                            <Link href={paths.clients.create}>
-                                <Plus /> Kunde anlegen
-                            </Link>
-                        </Button>
+                        hasOrganizationRoles(OrganizationRole.Admin) && (
+                            <Button asChild>
+                                <Link href={clientRoutes.create.url()}>
+                                    <Plus /> Kunde anlegen
+                                </Link>
+                            </Button>
+                        )
                     }
                 />
+
+                <Callout variant="error" title="Kundenlimit erreicht">
+                    Sie haben das Limit von 3 Kunden erreicht. Upgraden Sie
+                    Ihren Plan, um weitere Kunden anlegen zu können.{' '}
+                    <Link className="text-primary underline">Upgrade Plan</Link>
+                </Callout>
 
                 <DataTable
                     columns={columns}
                     rows={clients}
                     getRowId={(c) => c.id}
-                    onRowClick={(c) => router.visit(paths.clients.show(c.id))}
+                    onRowClick={(c) =>
+                        router.visit(clientRoutes.show.url(c.id))
+                    }
                     searchAccessor={(c) =>
-                        `${c.name} ${c.primaryDomain} ${c.reference}`
+                        `${c.name} ${c.primary_domain} ${c.reference}`
                     }
                     searchPlaceholder="Kunden durchsuchen …"
                     initialSort={{ columnId: 'name', dir: 'asc' }}
@@ -138,7 +154,7 @@ export default function ClientsIndex() {
                             description="Lege deinen ersten Kunden an, um Projekte und Releases zuzuordnen."
                             action={
                                 <Button asChild size="sm">
-                                    <Link href={paths.clients.create}>
+                                    <Link href={clientRoutes.create.url()}>
                                         Kunde anlegen
                                     </Link>
                                 </Button>
@@ -153,12 +169,12 @@ export default function ClientsIndex() {
                                 <ClientStatusBadge status={c.status} />
                             </div>
                             <p className="text-sm text-muted-foreground">
-                                {c.primaryDomain ?? '—'}
+                                {c.primary_domain ?? '—'}
                             </p>
-                            <p className="text-xs text-muted-foreground">
-                                {c.projectCount} Projekte ·{' '}
-                                {c.activeReleaseCount} aktive Releases
-                            </p>
+                            {/*<p className="text-xs text-muted-foreground">*/}
+                            {/*    {c.projectCount} Projekte ·{' '}*/}
+                            {/*    {c.activeReleaseCount} aktive Releases*/}
+                            {/*</p>*/}
                         </Card>
                     )}
                 />

@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Exceptions\Handler;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
     protected function configureDefaults(): void
     {
         Date::use(CarbonImmutable::class);
+
+        $this->app->bind(ExceptionHandler::class, Handler::class);
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),

@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Models\Organization;
+use App\Models\Project;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,14 +38,37 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user()?->loadMissing([
+            'currentOrganization',
+            'organizationMemberships:id,organization_id,user_id,role',
+        ]);
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
-            'organizations' => $request->user()?->organizations()->select(['id', 'name'])->get() ?? [],
-            'currentOrganization' => $request->user()?->loadMissing(['currentOrganization'])->currentOrganization ?? null,
+            'globalOrganizations' => [
+                ...$user?->organizations()->select(['id', 'name'])->get() ?? [],
+                ...Organization::query()
+                    ->whereHas(
+                        'memberships',
+                        fn (Builder $query) => $query
+                            ->where('user_id', $user?->id),
+                    )
+                    ->orWhereHas(
+                        'projects.members',
+                        fn (Builder $query) => $query
+                            ->where('user_id', $user?->id),
+                    )
+                    ->distinct()
+                    ->get(),
+            ],
+            'currentOrganization' => $user?->currentOrganization,
+            'currentOrganizationMembership' => $user?->organizationMemberships
+                ->where('organization_id', $user->current_organization_id)
+                ->first(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

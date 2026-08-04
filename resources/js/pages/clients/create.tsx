@@ -1,8 +1,9 @@
-import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
-import type { FormEvent } from 'react';
-
+import { Head, router, useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+import type { SubmitEventHandler } from 'react';
+import clientController from '@/actions/App/Http/Controllers/ClientController';
 import { FormField } from '@/components/forms/form-field';
+import InputError from '@/components/input-error';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,38 +16,39 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { paths } from '@/lib/routes';
-import { notify } from '@/lib/toast';
 import { getClient } from '@/mocks';
+import clientRoutes from '@/routes/clients';
 
 export default function ClientCreate({ id }: { id?: string }) {
     const existing = id ? getClient(id) : null;
     const isEdit = Boolean(existing);
-    const [submitting, setSubmitting] = useState(false);
 
-    const submit = (event: FormEvent) => {
+    const { data, setData, errors, processing, post } = useForm({
+        name: '',
+        reference: '',
+        primaryDomain: '',
+        status: 'active',
+        notes: '',
+        contactName: '',
+        contactEmail: '',
+    });
+
+    const submit: SubmitEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
-        setSubmitting(true);
-        notify.success(isEdit ? 'Kunde aktualisiert' : 'Kunde angelegt', {
-            description: isEdit
-                ? 'Deine Änderungen wurden gespeichert.'
-                : 'Der Kunde wurde erfolgreich erstellt.',
-        });
-        router.visit(
-            existing ? paths.clients.show(existing.id) : paths.clients.index,
-        );
+
+        post(clientController.store.url());
     };
 
     return (
         <>
             <Head title={isEdit ? 'Kunde bearbeiten' : 'Kunde anlegen'} />
-            <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-4 md:p-6">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-6">
                 <PageHeader
                     breadcrumbs={[
-                        { title: 'Kunden', href: paths.clients.index },
-                        { title: isEdit ? existing!.name : 'Neuer Kunde' },
+                        { title: 'Kunden', href: clientRoutes.index.url() },
+                        { title: 'Neuer Kunde' },
                     ]}
-                    title={isEdit ? 'Kunde bearbeiten' : 'Kunde anlegen'}
+                    title={'Kunde anlegen'}
                     description="Auftraggeber, dem Projekte und Releases zugeordnet werden."
                 />
 
@@ -60,11 +62,15 @@ export default function ClientCreate({ id }: { id?: string }) {
                                 <Input
                                     id="name"
                                     required
-                                    defaultValue={existing?.name}
+                                    value={data.name}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
                                     placeholder="z. B. Müller GmbH"
                                 />
+                                <InputError message={errors.name} />
                             </FormField>
-                            <div className="grid gap-5 sm:grid-cols-2">
+                            <div className="grid items-start gap-5 sm:grid-cols-2">
                                 <FormField
                                     id="reference"
                                     label="Referenz"
@@ -72,23 +78,37 @@ export default function ClientCreate({ id }: { id?: string }) {
                                 >
                                     <Input
                                         id="reference"
-                                        defaultValue={existing?.reference ?? ''}
+                                        value={data.reference}
+                                        onChange={(e) =>
+                                            setData('reference', e.target.value)
+                                        }
                                         placeholder="MUE-2024"
                                     />
+                                    <InputError message={errors.reference} />
                                 </FormField>
                                 <FormField id="domain" label="Primäre Domain">
                                     <Input
                                         id="domain"
-                                        defaultValue={
-                                            existing?.primaryDomain ?? ''
+                                        value={data.primaryDomain}
+                                        onChange={(e) =>
+                                            setData(
+                                                'primaryDomain',
+                                                e.target.value,
+                                            )
                                         }
                                         placeholder="firma.de"
+                                    />
+                                    <InputError
+                                        message={errors.primaryDomain}
                                     />
                                 </FormField>
                             </div>
                             <FormField id="status" label="Status" required>
                                 <Select
-                                    defaultValue={existing?.status ?? 'active'}
+                                    value={data.status}
+                                    onValueChange={(value) =>
+                                        setData('status', value)
+                                    }
                                 >
                                     <SelectTrigger id="status">
                                         <SelectValue />
@@ -105,14 +125,19 @@ export default function ClientCreate({ id }: { id?: string }) {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
+                                <InputError message={errors.status} />
                             </FormField>
                             <FormField id="notes" label="Notizen">
                                 <Textarea
                                     id="notes"
                                     rows={3}
-                                    defaultValue={existing?.notes ?? ''}
+                                    value={data.notes}
+                                    onChange={(e) =>
+                                        setData('notes', e.target.value)
+                                    }
                                     placeholder="Kontext zum Kunden …"
                                 />
+                                <InputError message={errors.notes} />
                             </FormField>
 
                             <div className="space-y-3 border-t pt-5">
@@ -123,11 +148,17 @@ export default function ClientCreate({ id }: { id?: string }) {
                                     <FormField id="contact-name" label="Name">
                                         <Input
                                             id="contact-name"
-                                            defaultValue={
-                                                existing?.contacts[0]?.name ??
-                                                ''
+                                            value={data.contactName ?? ''}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'contactName',
+                                                    e.target.value,
+                                                )
                                             }
                                             placeholder="Ansprechpartner"
+                                        />
+                                        <InputError
+                                            message={errors.contactName}
                                         />
                                     </FormField>
                                     <FormField
@@ -137,11 +168,17 @@ export default function ClientCreate({ id }: { id?: string }) {
                                         <Input
                                             id="contact-email"
                                             type="email"
-                                            defaultValue={
-                                                existing?.contacts[0]?.email ??
-                                                ''
+                                            value={data.contactEmail ?? ''}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'contactEmail',
+                                                    e.target.value,
+                                                )
                                             }
                                             placeholder="kontakt@firma.de"
+                                        />
+                                        <InputError
+                                            message={errors.contactEmail}
                                         />
                                     </FormField>
                                 </div>
@@ -152,15 +189,14 @@ export default function ClientCreate({ id }: { id?: string }) {
                                     type="button"
                                     variant="ghost"
                                     onClick={() =>
-                                        router.visit(paths.clients.index)
+                                        router.visit(clientRoutes.index.url())
                                     }
                                 >
                                     Abbrechen
                                 </Button>
-                                <Button type="submit" disabled={submitting}>
-                                    {isEdit
-                                        ? 'Änderungen speichern'
-                                        : 'Kunde anlegen'}
+                                <Button type="submit" disabled={processing}>
+                                    {processing && <LoaderCircle />}
+                                    Kunde anlegen
                                 </Button>
                             </div>
                         </form>

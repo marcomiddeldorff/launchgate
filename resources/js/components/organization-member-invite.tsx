@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle, UserPlus } from 'lucide-react';
-import type { SubmitEventHandler} from 'react';
+import type { SubmitEventHandler } from 'react';
 import { useState } from 'react';
 import organizationMembershipController from '@/actions/App/Http/Controllers/OrganizationMembershipController';
 import { FormField } from '@/components/forms/form-field';
@@ -16,33 +16,45 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { organizationRoleMeta } from '@/lib/roles';
-import type { Organization, OrganizationRole } from '@/types';
+import { OrganizationRole } from '@/types';
+import type { Organization } from '@/types';
 
 type MemberInviteProps = {
     organization: Organization;
-}
+};
 
-export default function MemberInvite({ organization }: MemberInviteProps) {
+export default function OrganizationMemberInvite({ organization }: MemberInviteProps) {
     const [open, setOpen] = useState(false);
 
     const { data, setData, processing, errors, post } = useForm({
-        email: "",
-        role: "client_tester" as OrganizationRole
+        email: '',
+        role: OrganizationRole.Viewer,
     });
 
     const invite: SubmitEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
-        console.log("works");
+        console.log('works');
 
-        post(organizationMembershipController.invite({ organization: organization.id }).url, {
-            onSuccess: () => {
-                setOpen(false);
-            }
-        })
-    }
+        post(
+            organizationMembershipController.invite({
+                organization: organization.id,
+            }).url,
+            {
+                onSuccess: () => {
+                    setOpen(false);
+                },
+            },
+        );
+    };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -83,18 +95,14 @@ export default function MemberInvite({ organization }: MemberInviteProps) {
                         <Select
                             value={data.role}
                             onValueChange={(v) =>
-                                setData("role", v as OrganizationRole)
+                                setData('role', v as OrganizationRole)
                             }
                         >
                             <SelectTrigger id="invite-role">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                {(
-                                    Object.keys(
-                                        organizationRoleMeta,
-                                    ) as OrganizationRole[]
-                                ).map((r) => (
+                                {Object.values(OrganizationRole).map((r) => (
                                     <SelectItem key={r} value={r}>
                                         {organizationRoleMeta[r].label}
                                     </SelectItem>

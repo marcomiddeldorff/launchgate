@@ -15,14 +15,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { paths } from '@/lib/routes';
 import { projects } from '@/mocks';
+import releaseRoutes from '@/routes/releases';
 
 export default function ReleaseCreate() {
     const submit = (event: FormEvent) => {
         event.preventDefault();
         toast.success('Release als Entwurf angelegt.');
-        router.visit(paths.releases.index);
+        router.visit(releaseRoutes.index.url());
     };
 
     return (
@@ -31,7 +31,7 @@ export default function ReleaseCreate() {
             <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-4 md:p-6">
                 <PageHeader
                     breadcrumbs={[
-                        { title: 'Releases', href: paths.releases.index },
+                        { title: 'Releases', href: releaseRoutes.index.url() },
                         { title: 'Neuer Release' },
                     ]}
                     title="Release anlegen"
@@ -125,7 +125,7 @@ export default function ReleaseCreate() {
                                     type="button"
                                     variant="ghost"
                                     onClick={() =>
-                                        router.visit(paths.releases.index)
+                                        router.visit(releaseRoutes.index.url())
                                     }
                                 >
                                     Abbrechen

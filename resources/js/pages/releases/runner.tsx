@@ -41,8 +41,8 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { formatRelative } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import { getRelease, runnerItemsForRelease, suitesForRelease } from '@/mocks';
+import releaseRoutes from '@/routes/releases';
 import type { ReviewResult } from '@/types';
 
 const resultActions: {
@@ -148,7 +148,7 @@ export default function TestRunner({ id }: { id: string }) {
                         asChild
                         aria-label="Schließen"
                     >
-                        <Link href={paths.releases.show(release.id)}>
+                        <Link href={releaseRoutes.show.url(release.id)}>
                             <X />
                         </Link>
                     </Button>
@@ -194,7 +194,9 @@ export default function TestRunner({ id }: { id: string }) {
                                 </Button>
                                 <Button asChild>
                                     <Link
-                                        href={paths.releases.show(release.id)}
+                                        href={releaseRoutes.show.url(
+                                            release.id,
+                                        )}
                                     >
                                         Zur Release-Übersicht <ArrowRight />
                                     </Link>

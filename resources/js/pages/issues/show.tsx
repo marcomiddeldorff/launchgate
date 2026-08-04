@@ -21,9 +21,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserInline } from '@/components/user-avatar';
 import { useAppContext } from '@/hooks/use-app-context';
 import { formatDateTime, formatRelative } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import { issueStatusMeta } from '@/lib/status';
 import { getIssue } from '@/mocks';
+import issueRoutes from '@/routes/issues';
+import releaseRoutes from '@/routes/releases';
 
 export default function IssueShow({ id }: { id: string }) {
     const { abilities, currentUser } = useAppContext();
@@ -35,7 +36,7 @@ export default function IssueShow({ id }: { id: string }) {
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 md:p-6">
                 <PageHeader
                     breadcrumbs={[
-                        { title: 'Issues', href: paths.issues.index },
+                        { title: 'Issues', href: issueRoutes.index.url() },
                         { title: `#${issue.number}` },
                     ]}
                     title={
@@ -184,7 +185,7 @@ export default function IssueShow({ id }: { id: string }) {
                                             term: 'Release',
                                             description: (
                                                 <Link
-                                                    href={paths.releases.show(
+                                                    href={releaseRoutes.show.url(
                                                         issue.releaseId,
                                                     )}
                                                     className="hover:underline"

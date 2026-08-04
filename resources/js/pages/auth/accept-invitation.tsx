@@ -7,7 +7,10 @@ import { register } from '@/routes';
 import type { Invitation, OrganizationRole, User } from '@/types';
 
 export default function AcceptInvitation() {
-    const { invitation, user } = usePage<{ invitation: Invitation, user: User | null }>().props;
+    const { invitation, user } = usePage<{
+        invitation: Invitation;
+        user: User | null;
+    }>().props;
 
     const role = organizationRoleMeta[invitation.role as OrganizationRole];
 
@@ -21,7 +24,7 @@ export default function AcceptInvitation() {
                     </span>
                     <p className="text-sm text-muted-foreground">
                         <span className="font-medium text-foreground">
-                            {invitation.invitedBy.name}
+                            {invitation.invited_by_user.name}
                         </span>{' '}
                         hat dich zu
                     </p>

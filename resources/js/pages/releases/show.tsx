@@ -43,7 +43,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserInline } from '@/components/user-avatar';
 import { useAppContext } from '@/hooks/use-app-context';
 import { formatDate, formatDateTime } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import {
     approvalsForRelease,
     auditForRelease,
@@ -52,6 +51,10 @@ import {
     issuesForRelease,
     suitesForRelease,
 } from '@/mocks';
+import approvalRoutes from '@/routes/approvals';
+import issueRoutes from '@/routes/issues';
+import projectRoutes from '@/routes/projects';
+import releaseRoutes from '@/routes/releases';
 
 export default function ReleaseShow({ id }: { id: string }) {
     const { abilities } = useAppContext();
@@ -76,10 +79,10 @@ export default function ReleaseShow({ id }: { id: string }) {
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-6">
                 <PageHeader
                     breadcrumbs={[
-                        { title: 'Releases', href: paths.releases.index },
+                        { title: 'Releases', href: releaseRoutes.index.url() },
                         {
                             title: `${release.projectName}`,
-                            href: paths.projects.show(release.projectId),
+                            href: projectRoutes.show.url(release.projectId),
                         },
                         { title: release.name },
                     ]}
@@ -99,14 +102,18 @@ export default function ReleaseShow({ id }: { id: string }) {
                                 <ReleaseStatusBadge status={release.status} />
                             </div>
                             <Button variant="outline" asChild>
-                                <Link href={paths.releases.runner(release.id)}>
+                                <Link
+                                    href={releaseRoutes.runner.url(release.id)}
+                                >
                                     <PlayCircle /> Prüfung starten
                                 </Link>
                             </Button>
                             {release.status === 'completed' ? (
                                 <Button asChild>
                                     <Link
-                                        href={paths.releases.report(release.id)}
+                                        href={releaseRoutes.report.url(
+                                            release.id,
+                                        )}
                                     >
                                         <FileText /> Abschlussbericht
                                     </Link>
@@ -114,7 +121,7 @@ export default function ReleaseShow({ id }: { id: string }) {
                             ) : (
                                 abilities.requestApprovals && (
                                     <Button asChild>
-                                        <Link href={paths.approvals.index}>
+                                        <Link href={approvalRoutes.index.url()}>
                                             <Send /> Freigabe anfordern
                                         </Link>
                                     </Button>
@@ -406,7 +413,9 @@ export default function ReleaseShow({ id }: { id: string }) {
                                 {release.progress.total} Prüfgegenstände
                             </p>
                             <Button asChild size="sm">
-                                <Link href={paths.releases.runner(release.id)}>
+                                <Link
+                                    href={releaseRoutes.runner.url(release.id)}
+                                >
                                     <PlayCircle /> Test-Runner öffnen
                                 </Link>
                             </Button>
@@ -502,7 +511,7 @@ export default function ReleaseShow({ id }: { id: string }) {
                             issues.map((issue) => (
                                 <Link
                                     key={issue.id}
-                                    href={paths.issues.show(issue.id)}
+                                    href={issueRoutes.show.url(issue.id)}
                                     className="block rounded-lg border bg-card p-4 transition-colors hover:border-primary/40"
                                 >
                                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -567,7 +576,7 @@ export default function ReleaseShow({ id }: { id: string }) {
                             approvals.map((approval) => (
                                 <Link
                                     key={approval.id}
-                                    href={paths.approvals.show(approval.id)}
+                                    href={approvalRoutes.show.url(approval.id)}
                                     className="block rounded-lg border bg-card p-4 transition-colors hover:border-primary/40"
                                 >
                                     <div className="flex flex-wrap items-center justify-between gap-2">

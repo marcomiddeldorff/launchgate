@@ -47,12 +47,12 @@ import { useAppContext } from '@/hooks/use-app-context';
 import { formatDate, formatRelative } from '@/lib/format';
 import { organizationRoleMeta } from '@/lib/roles';
 import { members } from '@/mocks';
-import type { OrganizationRole } from '@/types';
+import { OrganizationRole } from '@/types';
 
 export default function MembersIndex() {
     const { organization } = useAppContext();
     const [inviteOpen, setInviteOpen] = useState(false);
-    const [role, setRole] = useState<OrganizationRole>('client_tester');
+    const [role, setRole] = useState<OrganizationRole>(OrganizationRole.Viewer);
 
     const invite = (event: FormEvent) => {
         event.preventDefault();
@@ -115,10 +115,8 @@ export default function MembersIndex() {
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {(
-                                                    Object.keys(
-                                                        organizationRoleMeta,
-                                                    ) as OrganizationRole[]
+                                                {Object.values(
+                                                    OrganizationRole,
                                                 ).map((r) => (
                                                     <SelectItem
                                                         key={r}
@@ -259,10 +257,10 @@ export default function MembersIndex() {
                 </Card>
 
                 <Banner tone="info" title="Rollen & Berechtigungen">
-                    Owner verwalten die Organisation, Project Manager steuern
-                    Releases, Developer bearbeiten Issues, Client Tester führen
-                    Prüfungen durch und Approver erteilen die fachliche
-                    Freigabe.
+                    Owner verwalten die Organisation und Abrechnung, Admins
+                    verwalten Mitglieder, Projekte und Releases, Project Manager
+                    steuern Releases, Developer bearbeiten Issues und Viewer
+                    haben nur Lesezugriff.
                 </Banner>
             </div>
         </>

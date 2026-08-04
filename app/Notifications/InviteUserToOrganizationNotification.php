@@ -45,21 +45,9 @@ class InviteUserToOrganizationNotification extends Notification
 
         return (new MailMessage)
             ->subject('Ihre Einladung zu '.$this->invitation->organization->name)
-            ->salutation('Hallo')
+            ->greeting('Hallo')
             ->line('Sie wurden von '.$this->user->name.' eingeladen, der Organisation '.$this->invitation->organization->name.' beizutreten. Bitte klicken Sie auf den folgenden Button, um die Einladung anzunehmen.')
             ->action('Einladung annehmen', $acceptanceUrl)
-            ->line('Sie können diese E-Mail ignorieren, wenn Sie keine Einladung erwarten.');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            //
-        ];
+            ->salutation('Mit freundlichen Grüßen');
     }
 }

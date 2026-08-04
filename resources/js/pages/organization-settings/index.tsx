@@ -20,8 +20,8 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { useAppContext } from '@/hooks/use-app-context';
 import { planMeta } from '@/lib/capabilities';
-import { paths } from '@/lib/routes';
 import { cn } from '@/lib/utils';
+import orgSettingsRoutes from '@/routes/org-settings';
 
 type Tab = 'organization' | 'billing' | 'notifications';
 
@@ -29,13 +29,17 @@ const tabs: { id: Tab; label: string; href: string }[] = [
     {
         id: 'organization',
         label: 'Organisation',
-        href: paths.settings.organization,
+        href: orgSettingsRoutes.general.url(),
     },
-    { id: 'billing', label: 'Abrechnung & Plan', href: paths.settings.billing },
+    {
+        id: 'billing',
+        label: 'Abrechnung & Plan',
+        href: orgSettingsRoutes.billing.url(),
+    },
     {
         id: 'notifications',
         label: 'Benachrichtigungen',
-        href: paths.settings.notifications,
+        href: orgSettingsRoutes.notifications.url(),
     },
 ];
 
@@ -152,7 +156,7 @@ export default function OrganizationSettings({
                                     >
                                         <Select
                                             defaultValue={
-                                                organization.defaultLocale
+                                                organization.default_locale
                                             }
                                         >
                                             <SelectTrigger id="org-locale">

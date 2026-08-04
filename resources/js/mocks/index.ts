@@ -11,7 +11,7 @@ import { members, organization, organizations } from '@/mocks/organization';
 import { buildsByRelease, releases } from '@/mocks/releases';
 import { myAssignments, runnerItems, suitesByRelease } from '@/mocks/reviews';
 import { users } from '@/mocks/users';
-import type { OrganizationRole } from '@/types';
+import { OrganizationRole } from '@/types';
 
 export * from '@/mocks/users';
 export * from '@/mocks/organization';
@@ -27,7 +27,7 @@ export * from '@/mocks/activity';
  * Inertia props; while the backend is mocked we expose it here so the UI can
  * gate actions by ability. Change `demoRole` to preview a different role.
  */
-export const demoRole: OrganizationRole = 'owner';
+export const demoRole: OrganizationRole = OrganizationRole.Admin;
 export const currentUser = users.lena;
 export const abilities = abilitiesForRole(demoRole);
 export const currentOrganization = organization;

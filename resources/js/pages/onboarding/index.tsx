@@ -15,8 +15,10 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { paths } from '@/lib/routes';
+import { organizationRoleMeta } from '@/lib/roles';
 import { cn } from '@/lib/utils';
+import { dashboard } from '@/routes';
+import { OrganizationRole } from '@/types';
 
 const steps = [
     { id: 'profile', title: 'Über dich' },
@@ -35,7 +37,7 @@ export default function Onboarding() {
             toast.success(
                 'Einrichtung abgeschlossen. Willkommen bei LaunchGate!',
             );
-            router.visit(paths.dashboard);
+            router.visit(dashboard.url());
 
             return;
         }
@@ -230,23 +232,29 @@ export default function Onboarding() {
                                         />
                                     </FormField>
                                     <FormField id="invite-role" label="Rolle">
-                                        <Select defaultValue="client_tester">
+                                        <Select
+                                            defaultValue={
+                                                OrganizationRole.Viewer
+                                            }
+                                        >
                                             <SelectTrigger id="invite-role">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="project_manager">
-                                                    Project Manager
-                                                </SelectItem>
-                                                <SelectItem value="developer">
-                                                    Developer
-                                                </SelectItem>
-                                                <SelectItem value="client_tester">
-                                                    Client Tester
-                                                </SelectItem>
-                                                <SelectItem value="approver">
-                                                    Approver
-                                                </SelectItem>
+                                                {Object.values(
+                                                    OrganizationRole,
+                                                ).map((r) => (
+                                                    <SelectItem
+                                                        key={r}
+                                                        value={r}
+                                                    >
+                                                        {
+                                                            organizationRoleMeta[
+                                                                r
+                                                            ].label
+                                                        }
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                     </FormField>

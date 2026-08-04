@@ -13,8 +13,42 @@
 
 import type { User } from '@/types/auth';
 
-export type OrganizationRole =
-    'owner' | 'project_manager' | 'developer' | 'client_tester' | 'approver';
+/**
+ * Organization membership roles. Single source of truth on the frontend —
+ * mirrors the `App\Enums\OrganizationMembershipRole` PHP enum, keep the two in
+ * sync. Enumeration order is the display order. Iterate with
+ * `Object.values(OrganizationRole)`.
+ *
+ * Note: the organization owner is modelled separately (`Organization.owner`),
+ * not as a membership role.
+ */
+export enum OrganizationRole {
+    Admin = 'admin',
+    ProjectManager = 'project_manager',
+    Developer = 'developer',
+    Viewer = 'viewer',
+}
+
+/**
+ * Project membership roles. Single source of truth on the frontend — mirrors
+ * the `App\Enums\ProjectMembershipRole` PHP enum. Scoped to a single project
+ * and independent of the organization-level roles above.
+ */
+export enum ProjectRole {
+    ProjectManager = 'project_manager',
+    Developer = 'developer',
+    ClientTester = 'client_tester',
+    Approver = 'approver',
+}
+
+export enum EnvironmentTypeEnum {
+    Development = 'development',
+    Testing = 'testing',
+    Staging = 'staging',
+    Production = 'production',
+    Preview = 'preview',
+    Custom = 'custom',
+}
 
 export type MembershipStatus = 'active' | 'invited' | 'suspended';
 
@@ -133,16 +167,17 @@ export type PlanLimits = {
 
 export type Organization = {
     id: string;
+    owner_user_id: string;
     name: string;
     slug: string;
-    logoUrl: string | null;
-    defaultLocale: string;
+    logo_url: string | null;
+    default_locale: string;
     timezone: string;
-    createdAt: string;
+    created_at: string;
 
-    owner: User;
-    membershipsCount: number;
-    invitationsCount: number;
+    owner_user: User;
+    memberships_count: number;
+    invitations_count: number;
     memberships: OrganizationMembership[];
     invitations: Invitation[];
 };
@@ -151,11 +186,11 @@ export type OrganizationMembership = {
     id: string;
     role: string;
     status: string;
-    joinedAt: string;
+    joined_at: string;
 
     user: User;
     organization: Organization;
-}
+};
 
 export type OrganizationMember = {
     id: string;
@@ -170,17 +205,17 @@ export type OrganizationMember = {
 export type Client = {
     id: string;
     name: string;
-    slug: string;
-    reference?: string | null;
-    primaryDomain?: string | null;
+    reference: string | null;
+    primary_domain?: string | null;
     status: ClientStatus;
-    notes?: string | null;
-    logoUrl?: string | null;
-    contacts: ClientContact[];
-    projectCount: number;
-    activeReleaseCount: number;
-    createdAt: string;
-    archivedAt?: string | null;
+    notes: string | null;
+    logo_url: string | null;
+    contact_name: string | null;
+    contact_email: string | null;
+    created_at: string;
+    archived_at: string | null;
+
+    organization: Organization;
 };
 
 export type ClientContact = {
@@ -194,41 +229,43 @@ export type ClientContact = {
 
 export type Project = {
     id: string;
-    clientId: string;
-    clientName: string;
     name: string;
-    slug: string;
+    client_id: string;
+    project_manager_user_id: string;
+    default_locale: string;
+    timezone: string;
     description?: string | null;
     status: ProjectStatus;
-    repositoryUrl?: string | null;
-    projectManager: DomainUser;
-    members: ProjectMember[];
+    repository_url: string | null;
+
+    created_at: string;
+    archived_at?: string | null;
+
+    project_manager: User;
+    client: Client;
+    releases: Release[];
     environments: Environment[];
-    openIssueCount: number;
-    activeReleaseName?: string | null;
-    releaseCount: number;
-    createdAt: string;
-    archivedAt?: string | null;
+    members: ProjectMember[];
+    organization: Organization;
 };
 
 export type ProjectMember = {
     id: string;
-    user: DomainUser;
-    role: OrganizationRole;
-    canApprove: boolean;
-    canViewInternalComments: boolean;
+    user_id: string;
+    user: User;
+    role: ProjectRole;
 };
 
 export type Environment = {
     id: string;
-    projectId: string;
+    project_id: string;
     name: string;
     type: EnvironmentType;
-    url: string;
-    accessNotes?: string | null;
+    url: string | null;
+    access_notes?: string | null;
     username?: string | null;
-    isDefaultForTesting: boolean;
-    isActive: boolean;
+    is_default_for_testing: boolean;
+    is_active: boolean;
 };
 
 export type ReleaseBuild = {
@@ -471,12 +508,18 @@ export type Invitation = {
     id: string;
     email: string;
     role: string;
-    expiresAt: string;
-    createdAt: string;
+    expires_at: string;
+    created_at: string;
 
-    isExpired: boolean;
+    is_expired: boolean;
 
     organization: Organization;
-    invitedBy: User;
+    invited_by_user: User;
     project: Project;
-}
+};
+
+export type Locales = {
+    locale: string;
+    name: string;
+    localizedName: string;
+};

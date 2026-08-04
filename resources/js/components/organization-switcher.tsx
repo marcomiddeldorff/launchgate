@@ -1,8 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { Check, ChevronsUpDown, Plus, Settings2 } from 'lucide-react';
 import { useState } from 'react';
-import setCurrentOrganizationController
-    from '@/actions/App/Http/Controllers/Organization/SetCurrentOrganizationController';
+import setCurrentOrganizationController from '@/actions/App/Http/Controllers/Organization/SetCurrentOrganizationController';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu,
@@ -21,16 +20,16 @@ function OrganizationAvatar({
     organization,
     className,
 }: {
-    organization: Pick<Organization, 'name' | 'logoUrl'>;
+    organization: Pick<Organization, 'name' | 'logo_url'>;
     className?: string;
 }) {
     const initials = useInitials();
 
     return (
         <Avatar className={cn('size-8 rounded-lg', className)}>
-            {organization.logoUrl && (
+            {organization.logo_url && (
                 <AvatarImage
-                    src={organization.logoUrl}
+                    src={organization.logo_url}
                     alt={organization.name}
                     className="rounded-lg"
                 />
@@ -50,8 +49,13 @@ function OrganizationAvatar({
  * be persisted by posting to the backend from {@link handleSelect}.
  */
 export function OrganizationSwitcher() {
-    const { organizations, currentOrganization } = usePage<{ organizations: Organization[], currentOrganization: Organization | null }>().props;
-    const [activeId, setActiveId] = useState<string | null>(currentOrganization?.id ?? null);
+    const { globalOrganizations, currentOrganization } = usePage<{
+        globalOrganizations: Organization[];
+        currentOrganization: Organization | null;
+    }>().props;
+    const [activeId, setActiveId] = useState<string | null>(
+        currentOrganization?.id ?? null,
+    );
 
     const active = currentOrganization;
 
@@ -60,7 +64,9 @@ export function OrganizationSwitcher() {
             return;
         }
 
-        router.post(setCurrentOrganizationController.url({ organization: next.id }));
+        router.post(
+            setCurrentOrganizationController.url({ organization: next.id }),
+        );
 
         setActiveId(next.id);
     }
@@ -72,7 +78,9 @@ export function OrganizationSwitcher() {
                     type="button"
                     className="inline-flex max-w-[15rem] items-center gap-2 rounded-full py-1.5 pr-2 pl-1.5 transition-colors hover:bg-accent"
                 >
-                    {active ? <OrganizationAvatar organization={active} /> : undefined}
+                    {active ? (
+                        <OrganizationAvatar organization={active} />
+                    ) : undefined}
                     <span className="hidden min-w-0 flex-col text-left sm:flex">
                         <span className="truncate text-sm font-medium text-foreground">
                             {active?.name ?? 'Organisation auswählen'}
@@ -87,7 +95,7 @@ export function OrganizationSwitcher() {
             <DropdownMenuContent align="start" className="w-72">
                 <DropdownMenuLabel>Organisation wechseln</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {organizations.map((item) => (
+                {globalOrganizations.map((item) => (
                     <DropdownMenuItem
                         key={item.id}
                         onSelect={() => handleSelect(item)}

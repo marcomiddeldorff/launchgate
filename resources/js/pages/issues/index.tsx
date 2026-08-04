@@ -23,10 +23,10 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { UserInline } from '@/components/user-avatar';
 import { formatRelative } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import { issueStatusMeta } from '@/lib/status';
 import { cn } from '@/lib/utils';
 import { issues as allIssues } from '@/mocks';
+import issueRoutes from '@/routes/issues';
 import type { Issue, IssueStatus } from '@/types';
 
 export default function IssuesIndex() {
@@ -132,7 +132,7 @@ export default function IssuesIndex() {
                     columns={columns}
                     rows={rows}
                     getRowId={(i) => i.id}
-                    onRowClick={(i) => router.visit(paths.issues.show(i.id))}
+                    onRowClick={(i) => router.visit(issueRoutes.show.url(i.id))}
                     searchAccessor={(i) =>
                         `${i.number} ${i.title} ${i.releaseName} ${i.projectName}`
                     }

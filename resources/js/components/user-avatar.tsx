@@ -4,8 +4,9 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import type { DomainUser } from '@/types';
+import type { User } from '@/types';
 
 const sizeClasses = {
     xs: 'size-5 text-[10px]',
@@ -21,17 +22,19 @@ export function UserAvatar({
     size = 'sm',
     className,
 }: {
-    user: Pick<DomainUser, 'name' | 'initials' | 'avatarUrl'>;
+    user: User;
     size?: AvatarSize;
     className?: string;
 }) {
+    const initials = useInitials();
+
     return (
         <Avatar className={cn(sizeClasses[size], className)}>
             {user.avatarUrl && (
-                <AvatarImage src={user.avatarUrl} alt={user.name} />
+                <AvatarImage src={user.avatarUrl} alt={user?.name} />
             )}
             <AvatarFallback className="bg-primary/10 font-medium text-primary">
-                {user.initials}
+                {initials(user?.name)}
             </AvatarFallback>
         </Avatar>
     );
@@ -44,7 +47,7 @@ export function UserInline({
     size = 'sm',
     className,
 }: {
-    user: DomainUser;
+    user: User;
     secondary?: string;
     size?: AvatarSize;
     className?: string;
@@ -71,7 +74,7 @@ export function MemberAvatarGroup({
     max = 4,
     size = 'sm',
 }: {
-    users: DomainUser[];
+    users: User[];
     max?: number;
     size?: AvatarSize;
 }) {

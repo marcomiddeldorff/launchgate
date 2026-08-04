@@ -9,9 +9,8 @@ import { StatusBadge } from '@/components/status/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { UserInline } from '@/components/user-avatar';
-import { paths } from '@/lib/routes';
 import type { StatusTone } from '@/lib/status';
-import { projects } from '@/mocks';
+import projectRoutes from '@/routes/projects';
 import type { Project, ProjectStatus } from '@/types';
 
 const projectStatusMeta: Record<
@@ -23,7 +22,11 @@ const projectStatusMeta: Record<
     archived: { label: 'Archiviert', tone: 'neutral' },
 };
 
-export default function ProjectsIndex() {
+type ProjectsIndexProps = {
+    projects: Project[];
+}
+
+export default function ProjectsIndex({ projects }: ProjectsIndexProps) {
     const columns: DataTableColumn<Project>[] = [
         {
             id: 'name',
@@ -32,7 +35,7 @@ export default function ProjectsIndex() {
                 <div>
                     <p className="font-medium">{p.name}</p>
                     <p className="text-sm text-muted-foreground">
-                        {p.clientName}
+                        {p.client.name}
                     </p>
                 </div>
             ),
@@ -58,38 +61,38 @@ export default function ProjectsIndex() {
             },
             hideOnMobile: true,
         },
-        {
-            id: 'release',
-            header: 'Aktiver Release',
-            cell: (p) => (
-                <span className="text-sm text-muted-foreground">
-                    {p.activeReleaseName ?? '—'}
-                </span>
-            ),
-            hideOnMobile: true,
-        },
-        {
-            id: 'issues',
-            header: 'Offene Issues',
-            cell: (p) => (
-                <span
-                    className={
-                        p.openIssueCount > 0
-                            ? 'font-medium tabular-nums'
-                            : 'text-muted-foreground tabular-nums'
-                    }
-                >
-                    {p.openIssueCount}
-                </span>
-            ),
-            sortValue: (p) => p.openIssueCount,
-            align: 'center',
-            hideOnMobile: true,
-        },
+        // {
+        //     id: 'release',
+        //     header: 'Aktiver Release',
+        //     cell: (p) => (
+        //         <span className="text-sm text-muted-foreground">
+        //             {p.activeReleaseName ?? '—'}
+        //         </span>
+        //     ),
+        //     hideOnMobile: true,
+        // },
+        // {
+        //     id: 'issues',
+        //     header: 'Offene Issues',
+        //     cell: (p) => (
+        //         <span
+        //             className={
+        //                 p.openIssueCount > 0
+        //                     ? 'font-medium tabular-nums'
+        //                     : 'text-muted-foreground tabular-nums'
+        //             }
+        //         >
+        //             {p.openIssueCount}
+        //         </span>
+        //     ),
+        //     sortValue: (p) => p.openIssueCount,
+        //     align: 'center',
+        //     hideOnMobile: true,
+        // },
         {
             id: 'pm',
-            header: 'Project Manager',
-            cell: (p) => <UserInline user={p.projectManager} size="xs" />,
+            header: 'Projektmanager',
+            cell: (p) => <UserInline user={p.project_manager} size="xs" />,
             hideOnMobile: true,
         },
     ];
@@ -104,7 +107,7 @@ export default function ProjectsIndex() {
                     description="Die Anwendungen und Produkte, deren Releases hier geprüft werden."
                     actions={
                         <Button asChild>
-                            <Link href={paths.projects.create}>
+                            <Link href={projectRoutes.create.url()}>
                                 <Plus /> Projekt anlegen
                             </Link>
                         </Button>
@@ -115,8 +118,10 @@ export default function ProjectsIndex() {
                     columns={columns}
                     rows={projects}
                     getRowId={(p) => p.id}
-                    onRowClick={(p) => router.visit(paths.projects.show(p.id))}
-                    searchAccessor={(p) => `${p.name} ${p.clientName}`}
+                    onRowClick={(p) =>
+                        router.visit(projectRoutes.show.url(p.id))
+                    }
+                    searchAccessor={(p) => `${p.name} ${p.client.name}`}
                     searchPlaceholder="Projekte durchsuchen …"
                     initialSort={{ columnId: 'name', dir: 'asc' }}
                     emptyState={
@@ -126,7 +131,7 @@ export default function ProjectsIndex() {
                             description="Lege ein Projekt an, um Releases und Prüfungen zu organisieren."
                             action={
                                 <Button asChild size="sm">
-                                    <Link href={paths.projects.create}>
+                                    <Link href={projectRoutes.create.url()}>
                                         Projekt anlegen
                                     </Link>
                                 </Button>
@@ -150,12 +155,12 @@ export default function ProjectsIndex() {
                                 />
                             </div>
                             <p className="text-sm text-muted-foreground">
-                                {p.clientName}
+                                {p.client.name}
                             </p>
-                            <p className="text-xs text-muted-foreground">
-                                {p.activeReleaseName ?? 'Kein aktiver Release'}{' '}
-                                · {p.openIssueCount} offene Issues
-                            </p>
+                            {/*<p className="text-xs text-muted-foreground">*/}
+                            {/*    {p.activeReleaseName ?? 'Kein aktiver Release'}{' '}*/}
+                            {/*    · {p.openIssueCount} offene Issues*/}
+                            {/*</p>*/}
                         </Card>
                     )}
                 />

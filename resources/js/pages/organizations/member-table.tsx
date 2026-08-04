@@ -2,7 +2,7 @@ import { Ellipsis, Pencil, ShieldCheck, Trash, Users } from 'lucide-react';
 import type { DataTableColumn } from '@/components/data-table';
 import { DataTable } from '@/components/data-table';
 import { EmptyState } from '@/components/empty-state';
-import MemberInvite from '@/components/member-invite';
+import OrganizationMemberInvite from '@/components/organization-member-invite';
 import { StatusBadge } from '@/components/status/status-badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserAvatar } from '@/components/user-avatar';
@@ -10,21 +10,29 @@ import { formatDate } from '@/lib/format';
 import { organizationRoleMeta } from '@/lib/roles';
 import type { StatusTone } from '@/lib/status';
 import type { MembershipStatus, OrganizationRole, User } from '@/types';
-import type {
-    Organization,
-    OrganizationMembership} from '@/types';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
-    DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import type { Organization, OrganizationMembership } from '@/types';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import EditUser from '@/pages/organizations/edit-user';
 import { useState } from 'react';
-
 
 type MemberTableProps = {
     memberships: OrganizationMembership[];
     organization: Organization;
-}
+};
 
 const statusMeta: Record<
     MembershipStatus,
@@ -76,8 +84,12 @@ function initialsFor(name: string): string {
         .toUpperCase();
 }
 
-export default function MemberTable({ memberships, organization }: MemberTableProps) {
-    const [editMembership, setEditMembership] = useState<OrganizationMembership | null>(null);
+export default function MemberTable({
+    memberships,
+    organization,
+}: MemberTableProps) {
+    const [editMembership, setEditMembership] =
+        useState<OrganizationMembership | null>(null);
 
     const columns: DataTableColumn<OrganizationMembership>[] = [
         {
@@ -121,10 +133,10 @@ export default function MemberTable({ memberships, organization }: MemberTablePr
             header: 'Beigetreten',
             cell: (m) => (
                 <span className="text-sm text-muted-foreground">
-                    {formatDate(m.joinedAt)}
+                    {formatDate(m.joined_at)}
                 </span>
             ),
-            sortValue: (m) => m.joinedAt ?? '',
+            sortValue: (m) => m.joined_at ?? '',
             hideOnMobile: true,
         },
         {
@@ -140,7 +152,9 @@ export default function MemberTable({ memberships, organization }: MemberTablePr
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuGroup>
-                                <DropdownMenuItem onClick={() => setEditMembership(m)}>
+                                <DropdownMenuItem
+                                    onClick={() => setEditMembership(m)}
+                                >
                                     <Pencil />
                                     Bearbeiten
                                 </DropdownMenuItem>
@@ -155,7 +169,11 @@ export default function MemberTable({ memberships, organization }: MemberTablePr
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <EditUser membership={editMembership} organization={organization} onClose={() => setEditMembership(null)} />
+                    <EditUser
+                        membership={editMembership}
+                        organization={organization}
+                        onClose={() => setEditMembership(null)}
+                    />
                 </div>
             ),
         },
@@ -165,7 +183,7 @@ export default function MemberTable({ memberships, organization }: MemberTablePr
         <Card className="lg:col-span-2" variant="bare">
             <CardHeader className="flex-row items-center justify-between gap-2">
                 <CardTitle>Mitglieder</CardTitle>
-                <MemberInvite organization={organization} />
+                <OrganizationMemberInvite organization={organization} />
             </CardHeader>
             <CardContent>
                 <DataTable
@@ -181,7 +199,7 @@ export default function MemberTable({ memberships, organization }: MemberTablePr
                             title="Noch keine Mitglieder"
                             description="Lade dein erstes Mitglied in diese Organisation ein."
                             action={
-                                <MemberInvite organization={organization} />
+                                <OrganizationMemberInvite organization={organization} />
                             }
                             compact
                         />
@@ -211,7 +229,7 @@ export default function MemberTable({ memberships, organization }: MemberTablePr
                                 <MembershipStatusBadge status={m.status} />
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                Beigetreten {formatDate(m.joinedAt)}
+                                Beigetreten {formatDate(m.joined_at)}
                             </p>
                         </Card>
                     )}

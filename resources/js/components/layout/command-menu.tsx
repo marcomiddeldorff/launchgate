@@ -18,9 +18,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { paths } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { clients, issues, projects, releases } from '@/mocks';
+import { dashboard } from '@/routes';
+import approvalRoutes from '@/routes/approvals';
+import clientRoutes from '@/routes/clients';
+import issueRoutes from '@/routes/issues';
+import projectRoutes from '@/routes/projects';
+import releaseRoutes from '@/routes/releases';
+import reviewRoutes from '@/routes/reviews';
 
 type Command = {
     id: string;
@@ -38,7 +44,7 @@ function buildCommands(): Command[] {
             label: 'Übersicht',
             hint: 'Navigation',
             icon: LayoutDashboard,
-            href: paths.dashboard,
+            href: dashboard.url(),
             keywords: 'dashboard start',
         },
         {
@@ -46,7 +52,7 @@ function buildCommands(): Command[] {
             label: 'Kunden',
             hint: 'Navigation',
             icon: Building2,
-            href: paths.clients.index,
+            href: clientRoutes.index.url(),
             keywords: 'kunden clients',
         },
         {
@@ -54,7 +60,7 @@ function buildCommands(): Command[] {
             label: 'Projekte',
             hint: 'Navigation',
             icon: FolderKanban,
-            href: paths.projects.index,
+            href: projectRoutes.index.url(),
             keywords: 'projekte projects',
         },
         {
@@ -62,7 +68,7 @@ function buildCommands(): Command[] {
             label: 'Releases',
             hint: 'Navigation',
             icon: Rocket,
-            href: paths.releases.index,
+            href: releaseRoutes.index.url(),
             keywords: 'releases',
         },
         {
@@ -70,7 +76,7 @@ function buildCommands(): Command[] {
             label: 'Meine Prüfungen',
             hint: 'Navigation',
             icon: ClipboardCheck,
-            href: paths.reviews.mine,
+            href: reviewRoutes.mine.url(),
             keywords: 'prüfungen reviews tests',
         },
         {
@@ -78,7 +84,7 @@ function buildCommands(): Command[] {
             label: 'Issues',
             hint: 'Navigation',
             icon: Bug,
-            href: paths.issues.index,
+            href: issueRoutes.index.url(),
             keywords: 'issues probleme fehler',
         },
         {
@@ -86,7 +92,7 @@ function buildCommands(): Command[] {
             label: 'Freigaben',
             hint: 'Navigation',
             icon: UserCheck,
-            href: paths.approvals.index,
+            href: approvalRoutes.index.url(),
             keywords: 'freigaben approvals',
         },
     ];
@@ -96,7 +102,7 @@ function buildCommands(): Command[] {
         label: `${r.name} · ${r.projectName}`,
         hint: 'Release',
         icon: Rocket,
-        href: paths.releases.show(r.id),
+        href: releaseRoutes.show.url(r.id),
         keywords: `${r.name} ${r.projectName} ${r.clientName}`,
     }));
 
@@ -105,7 +111,7 @@ function buildCommands(): Command[] {
         label: p.name,
         hint: `Projekt · ${p.clientName}`,
         icon: FolderKanban,
-        href: paths.projects.show(p.id),
+        href: projectRoutes.show.url(p.id),
         keywords: `${p.name} ${p.clientName}`,
     }));
 
@@ -114,7 +120,7 @@ function buildCommands(): Command[] {
         label: c.name,
         hint: 'Kunde',
         icon: Building2,
-        href: paths.clients.show(c.id),
+        href: clientRoutes.show.url(c.id),
         keywords: c.name,
     }));
 
@@ -123,7 +129,7 @@ function buildCommands(): Command[] {
         label: `#${i.number} ${i.title}`,
         hint: `Issue · ${i.projectName}`,
         icon: Bug,
-        href: paths.issues.show(i.id),
+        href: issueRoutes.show.url(i.id),
         keywords: `${i.number} ${i.title} ${i.projectName}`,
     }));
 

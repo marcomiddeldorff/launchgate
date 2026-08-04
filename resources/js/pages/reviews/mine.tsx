@@ -17,9 +17,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { daysUntil, formatDate, isOverdue } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { myAssignments } from '@/mocks';
+import releaseRoutes from '@/routes/releases';
 import type { ReviewAssignment } from '@/types';
 
 const isDone = (a: ReviewAssignment) =>
@@ -34,7 +34,7 @@ function AssignmentCard({ assignment }: { assignment: ReviewAssignment }) {
 
     return (
         <Link
-            href={paths.releases.runner(assignment.releaseId)}
+            href={releaseRoutes.runner.url(assignment.releaseId)}
             className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:border-primary/40"
         >
             <div className="min-w-0 flex-1">

@@ -18,9 +18,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { formatDate } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import { releaseStatusMeta } from '@/lib/status';
 import { releases as allReleases } from '@/mocks';
+import releaseRoutes from '@/routes/releases';
 import type { Release, ReleaseStatus } from '@/types';
 
 export default function ReleasesIndex() {
@@ -120,7 +120,7 @@ export default function ReleasesIndex() {
                     description="Alle Releases über Projekte und Kunden hinweg."
                     actions={
                         <Button asChild>
-                            <Link href={paths.releases.create}>
+                            <Link href={releaseRoutes.create.url()}>
                                 <Rocket /> Neuer Release
                             </Link>
                         </Button>
@@ -131,7 +131,9 @@ export default function ReleasesIndex() {
                     columns={columns}
                     rows={rows}
                     getRowId={(r) => r.id}
-                    onRowClick={(r) => router.visit(paths.releases.show(r.id))}
+                    onRowClick={(r) =>
+                        router.visit(releaseRoutes.show.url(r.id))
+                    }
                     searchAccessor={(r) =>
                         `${r.name} ${r.projectName} ${r.clientName}`
                     }
@@ -170,7 +172,7 @@ export default function ReleasesIndex() {
                             description="Lege deinen ersten Release an, um den Prüfprozess zu starten."
                             action={
                                 <Button asChild size="sm">
-                                    <Link href={paths.releases.create}>
+                                    <Link href={releaseRoutes.create.url()}>
                                         Release anlegen
                                     </Link>
                                 </Button>

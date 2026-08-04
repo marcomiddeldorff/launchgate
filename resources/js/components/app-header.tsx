@@ -155,7 +155,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const { auth } = usePage().props;
     const { abilities } = useAppContext();
     const { currentUrl } = useCurrentUrl();
-    const initials = useInitials();
 
     const visiblePrimary = filterGroup(primaryNav, abilities);
     const visibleManage = filterGroup(manageNav, abilities);
@@ -275,11 +274,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             <DropdownMenuTrigger asChild>
                                 <button className="inline-flex items-center gap-3 rounded-full px-2 py-1.5 transition-colors hover:bg-accent">
                                     <UserAvatar
-                                        user={{
-                                            name: auth.user.name,
-                                            initials: initials(auth.user.name),
-                                            avatarUrl: '',
-                                        }}
+                                        user={auth.user}
                                         size="sm"
                                     />
                                     <span className="hidden text-sm font-medium text-foreground sm:inline">

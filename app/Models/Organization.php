@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrganizationMembershipStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,16 @@ class Organization extends Model
         return $this->hasMany(Invitation::class);
     }
 
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Client::class);
+    }
+
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
     public function isOwner(?string $userId = null): bool
     {
         return $this->owner_user_id === ($userId ?: auth()->id());
@@ -40,9 +51,27 @@ class Organization extends Model
 
     public function isMember(?string $userId = null): bool
     {
-        $members = $this->memberships()->pluck('id')->toArray();
+        return $this->memberships()
+            ->whereStatus(OrganizationMembershipStatus::ACTIVE->value)
+            ->whereUserId($userId ?: auth()->id())
+            ->exists();
+    }
 
-        return in_array($userId ?: auth()->id(), $members);
+    public function hasRole(User $user, string|array $roles): bool
+    {
+        if ($this->isOwner($user->id)) {
+            return true;
+        }
+
+        if (! $this->isMember($user->id)) {
+            return false;
+        }
+
+        $membership = $this->memberships()->where('user_id', $user->id)->first();
+
+        return is_string($roles)
+            ? $membership->role === $roles
+            : in_array($membership->role, $roles);
     }
 
     public function getLogoUrlAttribute(): ?string

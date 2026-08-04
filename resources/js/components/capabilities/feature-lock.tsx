@@ -5,8 +5,8 @@ import type { ReactNode } from 'react';
 import { PlanBadge } from '@/components/status/badges';
 import { Button } from '@/components/ui/button';
 import { capabilityLabels, requiredPlanFor } from '@/lib/capabilities';
-import { paths } from '@/lib/routes';
 import { cn } from '@/lib/utils';
+import orgSettingsRoutes from '@/routes/org-settings';
 import type { OrganizationCapabilities } from '@/types';
 
 /**
@@ -55,7 +55,7 @@ export function FeatureLock({
                 </p>
             </div>
             <Button asChild size="sm">
-                <Link href={paths.settings.billing}>
+                <Link href={orgSettingsRoutes.billing.url()}>
                     <Sparkles /> Jetzt upgraden
                 </Link>
             </Button>
@@ -75,7 +75,7 @@ export function UpgradeHint({
 
     return (
         <Link
-            href={paths.settings.billing}
+            href={orgSettingsRoutes.billing.url()}
             className={cn(
                 'inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline',
                 className,

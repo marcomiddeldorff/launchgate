@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Invitations\CreateNewInvitation;
 use App\Actions\OrganizationMemberships\UpdateMembership;
 use App\Enums\OrganizationMembershipRole;
+use App\Exceptions\InvitationForOrganizationAlreadyExistsException;
+use App\Exceptions\MemberWithEmailAlreadyExistsInOrganizationException;
 use App\Http\Requests\OrganizationMembership\InviteUserRequest;
 use App\Http\Requests\OrganizationMembership\UpdateMembershipRequest;
-use App\Http\Resources\InvitationResource;
-use App\Http\Resources\UserResource;
 use App\Models\Invitation;
 use App\Models\Organization;
 use App\Models\OrganizationMembership;
@@ -34,48 +35,34 @@ class OrganizationMembershipController extends Controller
             ])
             ->firstOrFail();
 
-        $this->ensureInvitationIsUsable($invitation);
+        $invitation->ensureInvitationIsUsable();
 
         $user = User::whereEmail($invitation->email)->first();
 
         return Inertia::render('auth/accept-invitation', [
-            'invitation' => new InvitationResource($invitation)->resolve(),
-            'user' => $user ? new UserResource($user) : null,
+            'invitation' => $invitation,
+            'user' => $user,
         ]);
     }
 
-    public function invite(InviteUserRequest $request, Organization $organization): void
+    public function invite(InviteUserRequest $request, Organization $organization, CreateNewInvitation $createNewInvitation): void
     {
         $validated = $request->validated();
 
-        // Ensure the email address has not been already invited to this organization.
-        if ($organization->invitations()->whereEmail($validated['email'])->exists()) {
-            throw ValidationException::withMessages([
-                'email' => 'Es existiert bereits eine Einladung für diese E-Mail-Adresse.',
-            ]);
+        try {
+            $createNewInvitation->create(
+                email: $validated['email'],
+                role: $validated['role'],
+                organization: $organization,
+                invitedBy: $request->user(),
+            );
+
+            Toast::success('Die Einladung wurde verschickt.');
+        } catch (InvitationForOrganizationAlreadyExistsException) {
+            Toast::error('Eine Einladung für die angegebene E-Mail Adresse ist bereits vorhanden.');
+        } catch (MemberWithEmailAlreadyExistsInOrganizationException) {
+            Toast::error('Ein Mitglied mit der angegebenen E-Mail Adresse existiert bereits in der Organisation.');
         }
-
-        // Ensure the email is not already a member of this organization.
-        if ($organization->memberships()->whereHas('user', fn ($query) => $query->whereEmail($validated['email']))->exists()) {
-            throw ValidationException::withMessages([
-                'email' => 'Dieser Benutzer ist bereits Mitglied dieser Organisation.',
-            ]);
-        }
-
-        $plainToken = Str::random(64);
-
-        $invitation = $organization->invitations()->create([
-            'email' => $validated['email'],
-            'role' => $validated['role'],
-            'token_hash' => Invitation::hashToken($plainToken),
-            'expires_at' => now()->addMinutes(30),
-            'invited_by_user_id' => $request->user()->id,
-        ]);
-
-        Notification::route('mail', $validated['email'])
-            ->notify(new InviteUserToOrganizationNotification($invitation, $plainToken, $request->user()));
-
-        Toast::success('Die Einladung wurde erfolgreich verschickt.');
     }
 
     public function update(UpdateMembershipRequest $request, Organization $organization, OrganizationMembership $membership, UpdateMembership $updateMembership)
@@ -84,27 +71,10 @@ class OrganizationMembershipController extends Controller
 
         $membership->loadMissing(['user:id,name']);
 
-        Toast::success('Die Rolle des Mitglieds '. $membership->user->name . ' wurde aktualisiert.');
+        Toast::success('Die Rolle des Mitglieds '.$membership->user->name.' wurde aktualisiert.');
     }
 
     /**
      * @throws \HttpException
      */
-    private function ensureInvitationIsUsable(
-        Invitation $invitation,
-    ): void {
-        if ($invitation->isAccepted()) {
-            throw new HttpException(
-                410,
-                'Diese Einladung wurde bereits angenommen.',
-            );
-        }
-
-        if ($invitation->isExpired()) {
-            throw new HttpException(
-                410,
-                'Diese Einladung ist abgelaufen.',
-            );
-        }
-    }
 }

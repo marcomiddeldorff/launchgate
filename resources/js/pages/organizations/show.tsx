@@ -16,7 +16,7 @@ import type { DataTableColumn } from '@/components/data-table';
 import { DefinitionList } from '@/components/definition-list';
 import { EmptyState } from '@/components/empty-state';
 import { FormField } from '@/components/forms/form-field';
-import MemberInvite from '@/components/member-invite';
+import OrganizationMemberInvite from '@/components/organization-member-invite';
 import { MetricCard } from '@/components/metric-card';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status/status-badge';
@@ -83,16 +83,18 @@ function OrgLogo({ name, logoUrl }: { name: string; logoUrl: string | null }) {
 
 type OrganizationsShowProps = {
     organization: Organization;
-}
+};
 
-export default function OrganizationsShow({ organization }: OrganizationsShowProps) {
+export default function OrganizationsShow({
+    organization,
+}: OrganizationsShowProps) {
     const memberships = organization.memberships ?? [];
     const invitations = organization.invitations ?? [];
 
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     const activeCount = memberships.filter((m) => m.status === 'active').length;
-    const invitedCount = organization.invitationsCount;
+    const invitedCount = organization.invitations_count;
 
     const destroy = () => {
         router.delete(orgs.destroy({ organization: organization.id }).url);
@@ -110,7 +112,7 @@ export default function OrganizationsShow({ organization }: OrganizationsShowPro
                     icon={
                         <OrgLogo
                             name={organization.name}
-                            logoUrl={organization.logoUrl}
+                            logoUrl={organization.logo_url}
                         />
                     }
                     title={organization.name}
@@ -219,8 +221,9 @@ export default function OrganizationsShow({ organization }: OrganizationsShowPro
                                             <span className="inline-flex items-center gap-1.5">
                                                 <Languages className="size-3.5 text-muted-foreground" />
                                                 {localeLabels[
-                                                    organization.defaultLocale
-                                                ] ?? organization.defaultLocale}
+                                                    organization.default_locale
+                                                ] ??
+                                                    organization.default_locale}
                                             </span>
                                         ),
                                     },
@@ -234,7 +237,7 @@ export default function OrganizationsShow({ organization }: OrganizationsShowPro
                                             <span className="inline-flex items-center gap-1.5">
                                                 <CalendarDays className="size-3.5 text-muted-foreground" />
                                                 {formatDate(
-                                                    organization.createdAt,
+                                                    organization.created_at,
                                                 )}
                                             </span>
                                         ),
@@ -249,7 +252,7 @@ export default function OrganizationsShow({ organization }: OrganizationsShowPro
                             memberships={organization.memberships}
                             organization={organization}
                         />
-                        {organization.invitationsCount > 0 && (
+                        {organization.invitations_count > 0 && (
                             <InvitedTable
                                 invitations={organization.invitations}
                                 organization={organization}

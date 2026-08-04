@@ -3,11 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\ProjectMembershipRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -16,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @property int $id
@@ -56,8 +59,50 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasMany(Organization::class, 'owner_user_id');
     }
 
+    public function organizationMemberships(): HasMany
+    {
+        return $this->hasMany(OrganizationMembership::class);
+    }
+
+    public function projectMemberships(): HasMany
+    {
+        return $this->hasMany(ProjectMembership::class);
+    }
+
+    public function memberOrganizations(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Organization::class,
+            'organization_memberships',
+            'user_id',
+            'organization_id',
+        )->withPivot([
+            'id',
+            'role',
+            'status',
+            'joined_at',
+        ])->withTimestamps();
+    }
+
     public function currentOrganization(): HasOne
     {
         return $this->hasOne(Organization::class, 'id', 'current_organization_id');
+    }
+
+    /**
+     * Returns the current organization the user has set or null.
+     */
+    public function getCurrentOrganization(): ?Organization
+    {
+        return $this->currentOrganization()->first();
+    }
+
+    public function ensureOrganizationIsSet(string $message = 'Bitte wähle eine Organisation aus.'): Organization
+    {
+        if ($organization = $this->getCurrentOrganization()) {
+            return $organization;
+        }
+
+        throw new HttpException(401, $message);
     }
 }

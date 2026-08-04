@@ -4,23 +4,21 @@ import { DataTable } from '@/components/data-table';
 import { StatusBadge } from '@/components/status/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { formatDateTime } from '@/lib/format';
 import { organizationRoleMeta } from '@/lib/roles';
 import type { StatusTone } from '@/lib/status';
-import type {
-    Invitation,
-    InvitationStatus,
-    OrganizationRole,
-} from '@/types';
-import type {
-    Organization, } from '@/types';
-
+import type { Invitation, InvitationStatus, OrganizationRole } from '@/types';
+import type { Organization } from '@/types';
 
 type InvitedTableProps = {
     invitations: Invitation[];
     organization: Organization;
-}
+};
 
 const statusMeta: Record<
     InvitationStatus,
@@ -70,13 +68,14 @@ export default function InvitedTable({ invitations }: InvitedTableProps) {
                 <div className="min-w-0">
                     <p className="truncate font-medium">
                         {m.email}{' '}
-                        {m.isExpired ? (
+                        {m.is_expired ? (
                             <Tooltip>
                                 <TooltipTrigger>
                                     <InvitedStatusBadge status="expired" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    Abgelaufene Einladungen werden automatisch gelöscht.
+                                    Abgelaufene Einladungen werden automatisch
+                                    gelöscht.
                                 </TooltipContent>
                             </Tooltip>
                         ) : null}
@@ -95,7 +94,7 @@ export default function InvitedTable({ invitations }: InvitedTableProps) {
             id: 'expires_at',
             header: 'Eingeladen am',
             cell: (m) => (
-                <InvitedStatusBadge status={formatDateTime(m.createdAt)} />
+                <InvitedStatusBadge status={formatDateTime(m.created_at)} />
             ),
             hideOnMobile: true,
         },
@@ -103,7 +102,7 @@ export default function InvitedTable({ invitations }: InvitedTableProps) {
             id: 'expires_at',
             header: 'Läuft ab am',
             cell: (m) => (
-                <InvitedStatusBadge status={formatDateTime(m.expiresAt)} />
+                <InvitedStatusBadge status={formatDateTime(m.expires_at)} />
             ),
             hideOnMobile: true,
         },
@@ -143,10 +142,10 @@ export default function InvitedTable({ invitations }: InvitedTableProps) {
                                 <RoleBadge role={m.role} />
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                Eingeladen am {formatDateTime(m.createdAt)}
+                                Eingeladen am {formatDateTime(m.created_at)}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                                Läuft ab am {formatDateTime(m.expiresAt)}
+                                Läuft ab am {formatDateTime(m.expires_at)}
                             </p>
                         </Card>
                     )}

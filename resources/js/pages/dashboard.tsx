@@ -26,7 +26,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserInline } from '@/components/user-avatar';
 import { useAppContext } from '@/hooks/use-app-context';
 import { daysUntil, formatDate, isOverdue } from '@/lib/format';
-import { paths } from '@/lib/routes';
 import {
     activeReleases,
     myAssignments,
@@ -36,6 +35,11 @@ import {
     recentActivity,
     releases,
 } from '@/mocks';
+import approvalRoutes from '@/routes/approvals';
+import issueRoutes from '@/routes/issues';
+import projectRoutes from '@/routes/projects';
+import releaseRoutes from '@/routes/releases';
+import reviewRoutes from '@/routes/reviews';
 
 export default function Dashboard() {
     const { organization, currentUser } = useAppContext();
@@ -80,7 +84,7 @@ export default function Dashboard() {
                     description={`Steuere Releases, Reviews und Freigaben für ${organization.name} aus einer zentralen Abnahmeoberfläche.`}
                     actions={
                         <Button asChild>
-                            <Link href={paths.releases.create}>
+                            <Link href={releaseRoutes.create.url()}>
                                 <Rocket /> Neuer Release
                             </Link>
                         </Button>
@@ -308,7 +312,7 @@ export default function Dashboard() {
                                             return (
                                                 <li key={release.id}>
                                                     <Link
-                                                        href={paths.releases.show(
+                                                        href={releaseRoutes.show.url(
                                                             release.id,
                                                         )}
                                                         className="block rounded-3xl border border-border/70 bg-background/75 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30"
@@ -370,14 +374,14 @@ export default function Dashboard() {
                             ).length
                         }
                         icon={FolderKanban}
-                        href={paths.projects.index}
+                        href={projectRoutes.index.url()}
                     />
                     <MetricCard
                         label="In Testphase"
                         value={testing.length}
                         icon={FlaskConical}
                         tone="info"
-                        href={paths.releases.index}
+                        href={releaseRoutes.index.url()}
                     />
                     <MetricCard
                         label="Bevorstehende Go-lives"
@@ -390,7 +394,7 @@ export default function Dashboard() {
                         value={blockers.length}
                         icon={OctagonAlert}
                         tone={blockers.length > 0 ? 'danger' : 'success'}
-                        href={paths.issues.index}
+                        href={issueRoutes.index.url()}
                     />
                     <MetricCard
                         label="Ausstehende Freigaben"
@@ -399,14 +403,14 @@ export default function Dashboard() {
                         tone={
                             pendingApprovals.length > 0 ? 'warning' : 'success'
                         }
-                        href={paths.approvals.index}
+                        href={approvalRoutes.index.url()}
                     />
                     <MetricCard
                         label="Überfällige Prüfungen"
                         value={overdueReviews.length}
                         icon={Clock}
                         tone={overdueReviews.length > 0 ? 'danger' : 'success'}
-                        href={paths.reviews.mine}
+                        href={reviewRoutes.mine.url()}
                     />
                 </div>
 
@@ -416,7 +420,7 @@ export default function Dashboard() {
                             <CardHeader className="flex-row items-center justify-between">
                                 <CardTitle>Releases in Testphase</CardTitle>
                                 <Button variant="ghost" size="sm" asChild>
-                                    <Link href={paths.releases.index}>
+                                    <Link href={releaseRoutes.index.url()}>
                                         Alle Releases <ArrowRight />
                                     </Link>
                                 </Button>
@@ -433,7 +437,7 @@ export default function Dashboard() {
                                     testing.map((release) => (
                                         <Link
                                             key={release.id}
-                                            href={paths.releases.show(
+                                            href={releaseRoutes.show.url(
                                                 release.id,
                                             )}
                                             className="block rounded-[1.6rem] border border-border/70 bg-background/75 p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30"
@@ -534,7 +538,7 @@ export default function Dashboard() {
                                                 >
                                                     <div className="min-w-0">
                                                         <Link
-                                                            href={paths.releases.show(
+                                                            href={releaseRoutes.show.url(
                                                                 release.id,
                                                             )}
                                                             className="font-medium hover:text-primary"
@@ -588,7 +592,7 @@ export default function Dashboard() {
                                         {pendingApprovals.map((approval) => (
                                             <li key={approval.id}>
                                                 <Link
-                                                    href={paths.approvals.show(
+                                                    href={approvalRoutes.show.url(
                                                         approval.id,
                                                     )}
                                                     className="block rounded-[1.5rem] border border-border/70 bg-background/75 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30"
@@ -645,7 +649,7 @@ export default function Dashboard() {
                         description="Lege deinen ersten Release an, um mit dem strukturierten Prüf- und Freigabeprozess zu starten."
                         action={
                             <Button asChild>
-                                <Link href={paths.releases.create}>
+                                <Link href={releaseRoutes.create.url()}>
                                     Release anlegen
                                 </Link>
                             </Button>
